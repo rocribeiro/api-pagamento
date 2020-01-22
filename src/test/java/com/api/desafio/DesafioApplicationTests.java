@@ -9,10 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class DesafioApplicationTests {
-	@Autowired
-	PaymentService ps;
-	@Autowired
-	BuyerService bs;
 
 
 }
