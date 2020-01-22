@@ -19,6 +19,7 @@ public class PaymentController {
     @PostMapping("/payment")
     public @ResponseBody String payment(@RequestBody Payment payment){
         Buyer buyer = bs.searchCpf(payment.getBuyer().getCpf());
+        payment.setStatus("Processado");
         if(buyer != null){
             payment.setBuyer(buyer);
             payment = ps.addPayment(payment);
@@ -27,6 +28,19 @@ public class PaymentController {
             payment = ps.addPayment(payment);
             return reponsePayment(payment.getType(),payment.getBoletoNumber(),payment.getCard());
         }
+    }
+
+    @PostMapping("/changeStatus/{id}")
+    public void changeStatus(@RequestBody String status,@PathVariable Long id){
+        Payment payment = ps.getPayment(id);
+        payment.setStatus(status);
+        ps.addPayment(payment);
+
+    }
+
+    @GetMapping("/status/{id}")
+    public String searchStatus(@PathVariable Long id){
+        return ps.getPayment(id).getStatus();
     }
 
     private String reponsePayment(int type, String boletoNumber, Card card) {

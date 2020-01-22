@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BuyerRepository extends JpaRepository<Buyer,Long> {
-    @Query(value="SELECT * FROM buyer p WHERE p.cpf = :cpf",nativeQuery=true)
+    @Query(value="SELECT * FROM buyer b WHERE b.cpf = :cpf",nativeQuery=true)
     public Buyer searchCpf(@Param("cpf") String cpf);
 }

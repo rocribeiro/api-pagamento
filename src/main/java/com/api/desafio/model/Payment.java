@@ -11,6 +11,8 @@ public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @OneToOne(cascade= CascadeType.ALL, fetch=FetchType.EAGER)
+    private Client client;
     private Double Amount;
     private String boletoNumber;
     private int Type;
