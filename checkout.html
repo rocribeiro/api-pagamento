@@ -4,24 +4,21 @@
     <title>Page Title</title>
     <style>
         .ajuste{width: 10%;}
+        #boleto{display: none;}
+        #cartao{display: none;}
     </style>
-    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script type="text/javascript" src="https://assets.moip.com.br/v2/moip-2.8.0.min.js"></script>
 
     <script type="text/javascript">
 
         $(document).ready(function() {
-            var month;
-            var year;
-            
             $("#valid").click(function() {
-                month = $("#dateCard").split("/")[0];
-                year = $("#dateCard").split("/")[1];
               var cc = new Moip.CreditCard({
                 number  : $("#number").val(),
-                cvc     : $("#cvc").val(),
-                expMonth: month,
-                expYear : year,
+                cvc     : $("#cvv").val(),
+                expMonth: $("#dateCard").val().split("/")[0],
+                expYear : $("#dateCard").val().split("/")[1],
                 pubKey  : "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoBttaXwRoI1Fbcond5mS7QOb7X2lykY5hvvDeLJelvFhpeLnS4YDwkrnziM3W00UNH1yiSDU+3JhfHu5G387O6uN9rIHXvL+TRzkVfa5iIjG+ap2N0/toPzy5ekpgxBicjtyPHEgoU6dRzdszEF4ItimGk5ACx/lMOvctncS5j3uWBaTPwyn0hshmtDwClf6dEZgQvm/dNaIkxHKV+9jMn3ZfK/liT8A3xwaVvRzzuxf09xJTXrAd9v5VQbeWGxwFcW05oJulSFjmJA9HcmbDYHJT+sG2mlZDEruCGAzCVubJwGY1aRlcs9AQc1jIm/l8JwH7le2kpk3QoX+gz0wWwIDAQAB"
               });
               console.log(cc);
@@ -30,9 +27,65 @@
               }
               else{
                 $("#card_type").val('');
-                alert('Invalid credit card. Verify parameters: number, cvc, expiration Month, expiration Year');
+                alert('Cartão Invalido');
               }
+
+              $.post("http://localhost:8080/payment",
+              {
+                amount:5000 ,
+                type: 2,
+                status:"Inicial",
+                buyer:{
+                   name:$("#nome").val(),
+                   email:$("#email").val(),
+                   cpf:$("#cpf").val()
+                },
+                card:{
+                  holderName:$("#holderName").val(),
+                  number:$("#number").val(),
+                  expirationDate:$("#dateCard").val(),
+                  cvv:$("#cvv").val()
+                }
+              },
+              function(data, status){
+                alert("Data: " + data + "\nStatus: " + status);
+              });
             });
+
+            $("#validBoleto").click(function() {
+              $.ajax({
+                  method: "POST",
+                  headers:{    
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json',
+                  'Access-Control-Allow-Origin': '*' 
+                },
+                url:'http://localhost:8080/payment',
+                data: {
+                  amount:5000 ,
+                  type: 1,
+                  status:"Inicial",
+                  buyer:{
+                    name:$("#nome").val(),
+                    email:$("#email").val(),
+                    cpf:$("#cpf").val()
+                   }
+                }
+              }).done(function(msg){
+                  $("#resultado").html(msg);
+                }).fail(function(jqXHR, textStatus, msg){
+                          alert(msg);
+                }); 
+            });
+
+
+            $("#boletoBtn").click(function(){
+              $("#boleto").toggle()
+            });
+            $("#cartaoBtn").click(function(){
+              $("#cartao").toggle()
+            });
+
         });
       </script>
 
@@ -42,25 +95,40 @@
     <h2>Dados do Comprador</h2>
     <div class="ajuste">
         <label>Nome:</label>
-        <input/>
+        <input id="nome"/>
         <label>Email:</label>
-        <input/>
+        <input id="email"/>
         <label>CPF:</label>
-        <input/>
+        <input id="cpf"/>
     </div>
-    <h2>Dados do Cartão de crédito</h2>
-        <div class="ajuste">
-            <label>Nome do cartão:</label>
-            <input/>
-            <label id="number">numero do cartão:</label>
-            <input/>
-            <label id="dateCard"> data de validade:</label>
-            <input/>
-            <label id="cvv">cvv:</label id>
-            <input/>
-            <label>Cartão Bandeira</label>
-            <input type="text" placeholder="Bandeira" id="card_type" readonly/>
-        </div>
-            <input type="button" id="valid" value="Enviar"/>
+    <div>
+      <h2>Forma de Pagamento</h2>
+      <input type="button" id="boletoBtn" value="Boleto"/>
+      <input type="button" id="cartaoBtn" value="Cartao"/>
+    </div>
+    <div id="boleto">
+      <h2>Boleto</h2>
+      <label>Numero do Boleto</label>
+      <input id="boletoNumber"/>
+      <input type="button" id="validBoleto" value="Enviar"/>
+    </div>
+    <div id="cartao">
+      <h2>Dados do Cartão de crédito</h2>
+          <div class="ajuste">
+              <label>Nome do cartão:</label>
+              <input id="holderName"/>
+              <label >numero do cartão:</label>
+              <input id="number"/>
+              <label > data de validade:</label>
+              <input id="dateCard"/>
+              <label >cvv:</label id>
+              <input id="cvv"/>
+              <label>Cartão Bandeira</label>
+              <input type="text" placeholder="Bandeira" id="card_type" readonly/>
+          </div>
+          <input type="button" id="valid" value="Enviar"/>
+      </div>
+  
+            
     </body>
 </html>
