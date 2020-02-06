@@ -11,19 +11,19 @@ import java.util.UUID;
 @Service
 public class PaymentService {
     @Autowired
-    PaymentRepository pr;
+    PaymentRepository paymentRepository;
 
     public Payment getPayment(Long id){
-        return pr.getOne(id);
+        return paymentRepository.getOne(id);
     }
 
     public Payment addPayment(Payment payment){
         if(payment.getType() == 1){
             UUID boletoNumber = UUID.randomUUID();
             payment.setBoletoNumber(boletoNumber.toString());
-            return  pr.save(payment);
+            return  paymentRepository.save(payment);
         }else{
-            return  pr.save(payment);
+            return  paymentRepository.save(payment);
         }
     }
 

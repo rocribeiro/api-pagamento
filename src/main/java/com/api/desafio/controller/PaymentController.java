@@ -12,35 +12,35 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class PaymentController {
     @Autowired
-    PaymentService ps;
+    PaymentService paymentService;
     @Autowired
-    BuyerService bs;
+    BuyerService buyerService;
 
     @PostMapping("/payment")
     public @ResponseBody String payment(@RequestBody Payment payment){
-        Buyer buyer = bs.searchCpf(payment.getBuyer().getCpf());
+        Buyer buyer = buyerService.searchCpf(payment.getBuyer().getCpf());
         payment.setStatus("Processado");
         if(buyer != null){
             payment.setBuyer(buyer);
-            payment = ps.addPayment(payment);
+            payment = paymentService.addPayment(payment);
             return reponsePayment(payment.getType(),payment.getBoletoNumber(),payment.getCard());
         }else {
-            payment = ps.addPayment(payment);
+            payment = paymentService.addPayment(payment);
             return reponsePayment(payment.getType(),payment.getBoletoNumber(),payment.getCard());
         }
     }
 
     @PostMapping("/changeStatus/{id}")
     public void changeStatus(@RequestBody String status,@PathVariable Long id){
-        Payment payment = ps.getPayment(id);
+        Payment payment = paymentService.getPayment(id);
         payment.setStatus(status);
-        ps.addPayment(payment);
+        paymentService.addPayment(payment);
 
     }
 
     @GetMapping("/status/{id}")
     public String searchStatus(@PathVariable Long id){
-        return ps.getPayment(id).getStatus();
+        return paymentService.getPayment(id).getStatus();
     }
 
     private String reponsePayment(int type, String boletoNumber, Card card) {

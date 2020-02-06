@@ -8,10 +8,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class BuyerService {
     @Autowired
-    BuyerRepository br;
+    BuyerRepository buyerRepository;
 
     public Buyer searchCpf(String cpf){
-       return br.searchCpf(cpf);
+       return buyerRepository.searchCpf(cpf);
     }
 
 }
